@@ -32,6 +32,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+#include <chrono>
 #include <omp.h>
 #include <mutex>
 #include <math.h>
@@ -1017,10 +1018,14 @@ int main(int argc, char** argv)
     /* 2. pcd save will largely influence the real-time performences **/
     if (pcl_wait_save->size() > 0 && pcd_save_en)
     {
-        string file_name = string("scans.pcd");
-        string all_points_dir(string(string(ROOT_DIR) + "PCD/") + file_name);
+        std::chrono::system_clock::time_point time_now = std::chrono::system_clock::now();
+        std::time_t time_now_c = std::chrono::system_clock::to_time_t(time_now);
+        char buf[20];
+        strftime(buf, 20, "%Y_%m_%d-%H_%M_%S", localtime(&time_now_c));
+        std::string file_name(buf);
+        string all_points_dir(string(string(ROOT_DIR) + "PCD/") + file_name + ".pcd");
         pcl::PCDWriter pcd_writer;
-        cout << "current scan saved to /PCD/" << file_name<<endl;
+        cout << "current scan saved to /PCD/" << file_name << ".pcd" << endl;
         pcd_writer.writeBinary(all_points_dir, *pcl_wait_save);
     }
 
